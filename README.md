@@ -19,11 +19,13 @@ Parameters are passed through variables:
 
 Examples:
   ```
-  echo "en un lugar de la Mancha de cuyo nombre no quiero acordarme" | \
+  $ echo "en un lugar de la Mancha de cuyo nombre no quiero acordarme" | \
     ./cut-fields.awk \
 	-v fields='-2,4-6,8-' \
 	-v FS='[[:blank:],]' \
 	-v OFS=","  \
 	-v complement=y \
 	-v only_delimited=y
+
+lugar,de
   ````
