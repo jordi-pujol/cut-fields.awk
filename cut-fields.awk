@@ -49,41 +49,54 @@ BEGIN {
 }
 {
 	record=$0
-	delete flist
-	for (h in fieldsarray) {
-		f=fieldsarray[h]
-		if (!f) continue
-		i=index(f, "-")
-		if (i != 0) { # range
-			m = split(f, g, "-")
-			if (m == 2 && ! g[2])
-				m=1
-			if (m == 2 && ! g[1])
-				m=1
-			if (m == 0 || m > 2 \
-			|| (! g[1] && ! g[2]) \
-			|| (g[1] && g[1] !~ "^[[:digit:]]+$") \
-			|| (g[2] && g[2] !~ "^[[:digit:]]+$") \
-			|| (m == 2 && g[1] >= g[2]) )
-				bad_range()
-			if (m == 2)
-				for (j=g[1]; j <= g[2]; j++)
-					flist[j] = j
-			else
-				if (i == 1)
-					for (j=1; j <= g[2]; j++)
+	if (! flist[-1]) {
+		flist[-1]=-1
+		for (h in fieldsarray) {
+			f=fieldsarray[h]
+			if (!f) continue
+			i=index(f, "-")
+			if (i != 0) { # range
+				m = split(f, g, "-")
+				if (m == 2 && ! g[2])
+					m=1
+				if (m == 2 && ! g[1])
+					m=1
+				if (m == 0 || m > 2 \
+				|| (! g[1] && ! g[2]) \
+				|| (g[1] && g[1] !~ "^[[:digit:]]+$") \
+				|| (g[2] && g[2] !~ "^[[:digit:]]+$") \
+				|| (m == 2 && g[1] >= g[2]) )
+					bad_range()
+				if (m == 2)
+					for (j=g[1]; j <= g[2]; j++)
 						flist[j] = j
 				else
-					if (i == length(f))
-						for (j=g[1]; j <= NF; j++)
+					if (i == 1)
+						for (j=1; j <= g[2]; j++)
 							flist[j] = j
 					else
-						bad_range()
-		} else { # single field
-			if (f !~ "^[[:digit:]]+$")
-				bad_range()
-			flist[f] = f
+						if (i == length(f)) {
+							for (j=g[1]; j <= NF; j++)
+								flist[j] = j
+							fieldsMin=(g[1] >= NF ? g[1] : NF)
+						} else
+							bad_range()
+			} else { # single field
+				if (f !~ "^[[:digit:]]+$")
+					bad_range()
+				flist[f] = f
+			}
 		}
+		if (Debug)
+			for (i in flist)
+				printf("flist[%s]\n", i) > "/dev/stderr"
+	}
+	if (fieldsMin && fieldsMin < NF) {
+		for (j=fieldsMin+1; j <= NF; j++)
+			flist[j] = j
+		if (Debug)
+			printf("fieldsMin=NF: %s=%s\n", fieldsMin, NF) > "/dev/stderr"
+		fieldsMin=NF
 	}
 	for (i=NF; i>= 1; i--)
 		if (complement ? (i in flist) : !(i in flist)) {
@@ -94,6 +107,6 @@ BEGIN {
 	if ($0)
 		print $0
 	else
-	if (! only_delimited)
-		print record
+		if (! only_delimited)
+			print record
 }
