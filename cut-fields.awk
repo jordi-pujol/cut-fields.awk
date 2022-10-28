@@ -14,22 +14,22 @@
 ##
 
 function usage(e1) {
-	e1 = "usage: echo \"text\" | cut-fields.awk\
-\n\tMimics the syntax and behaviour of the coreutils cut utility.\
-\n\tParameters are passed through variables:\
-\n\t-v fields= select only these fields;\
-\n\t\talso print any line that contains no delimiter character,\
-\n\t\tunless the only_delimited option is specified\
-\n\t-v FS= delimiter may be a regular expression, optional,\
-\n\t\tif not specified will use the awk default field delimiter\
-\n\t-v OFS= output delimiter, optional\
-\n\t\tif not specified will use the awk default field output delimiter\
-\n\t-v RS= record delimiter, optional,\
-\n\t\tif not specified will use the awk default record delimiter\
-\n\t-v complement= complement the set of selected fields,\
-\n\t\tset to any character to enable\
-\n\t-v only_delimited= do not print lines not containing delimiters,\
-\n\t\tset to any character to enable"
+	e1 = "usage: echo \"text\" | cut-fields.awk" \
+"\n\tMimics the syntax and behaviour of the coreutils cut utility." \
+"\n\tParameters are passed through variables:" \
+"\n\t-v fields= select only these fields;" \
+"\n\t\talso print any line that contains no delimiter character," \
+"\n\t\tunless the only_delimited option is specified" \
+"\n\t-v FS= delimiter may be a regular expression, optional," \
+"\n\t\tif not specified will use the awk default field delimiter" \
+"\n\t-v OFS= output delimiter, optional" \
+"\n\t\tif not specified will use the awk default field output delimiter" \
+"\n\t-v RS= record delimiter, optional," \
+"\n\t\tif not specified will use the awk default record delimiter" \
+"\n\t-v complement= complement the set of selected fields," \
+"\n\t\tset to any character to enable" \
+"\n\t-v only_delimited= do not print lines not containing delimiters," \
+"\n\t\tset to any character to enable"
 	print e1 > "/dev/stderr"
 	exit 1
 }
@@ -46,14 +46,17 @@ BEGIN {
 	split(fields, fieldsarray, "[,[:blank:]]+")
 	if (length(fieldsarray) == 0)
 		usage()
+	fieldsMin=""
+	flistSet=""
 }
 {
 	record=$0
-	if (! flist[-1]) {
-		flist[-1]=-1
+	if (! flistSet) {
+		flistSet="y"
 		for (h in fieldsarray) {
 			f=fieldsarray[h]
-			if (!f) continue
+			if (!f)
+				continue
 			i=index(f, "-")
 			if (i != 0) { # range
 				m = split(f, g, "-")
@@ -78,7 +81,7 @@ BEGIN {
 						if (i == length(f)) {
 							for (j=g[1]; j <= NF; j++)
 								flist[j] = j
-							fieldsMin=(g[1] >= NF ? g[1] : NF)
+							fieldsMin= g[1] >= NF ? g[1] : NF
 						} else
 							bad_range()
 			} else { # single field
@@ -90,6 +93,8 @@ BEGIN {
 		if (Debug)
 			for (i in flist)
 				printf("flist[%s]\n", i) > "/dev/stderr"
+		if (length(flist) == 0)
+			usage()
 	}
 	if (fieldsMin && fieldsMin < NF) {
 		for (j=fieldsMin+1; j <= NF; j++)
