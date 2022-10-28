@@ -72,15 +72,15 @@ BEGIN {
 					bad_range()
 				if (m == 2)
 					for (j=g[1]; j <= g[2]; j++)
-						flist[j] = j
+						flist[j]=j
 				else
 					if (i == 1)
 						for (j=1; j <= g[2]; j++)
-							flist[j] = j
+							flist[j]=j
 					else
 						if (i == length(f)) {
 							for (j=g[1]; j <= NF; j++)
-								flist[j] = j
+								flist[j]=j
 							fieldsMin= g[1] >= NF ? g[1] : NF
 						} else
 							bad_range()
@@ -98,7 +98,7 @@ BEGIN {
 	}
 	if (fieldsMin && fieldsMin < NF) {
 		for (j=fieldsMin+1; j <= NF; j++)
-			flist[j] = j
+			flist[j]=j
 		if (Debug)
 			printf("fieldsMin=NF: %s=%s\n", fieldsMin, NF) > "/dev/stderr"
 		fieldsMin=NF
