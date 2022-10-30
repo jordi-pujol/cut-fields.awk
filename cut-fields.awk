@@ -90,17 +90,12 @@ BEGIN {
 				flist[f] = f
 			}
 		}
-		if (Debug)
-			for (i in flist)
-				printf("flist[%s]\n", i) > "/dev/stderr"
 		if (length(flist) == 0)
 			usage()
 	}
 	if (fieldsMin && fieldsMin < NF) {
 		for (j=fieldsMin+1; j <= NF; j++)
 			flist[j]=j
-		if (Debug)
-			printf("fieldsMin=NF: %s=%s\n", fieldsMin, NF) > "/dev/stderr"
 		fieldsMin=NF
 	}
 	for (i=NF; i>= 1; i--)
