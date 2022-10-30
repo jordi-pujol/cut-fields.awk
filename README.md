@@ -42,7 +42,12 @@ lugar,de
   ````
 
   ```
-$ ./cut-fields.awk -v fields='1,4-5,8-' -v complement= -v only_delimited= cut-fields-test1.txt; echo $?
+$ ./cut-fields.awk \
+	-v fields='1,4-5,8-' \
+	-v complement= \
+	-v only_delimited= \
+	cut-fields-test1.txt; \
+	echo $?
 
 en de la
 en de la nombre
