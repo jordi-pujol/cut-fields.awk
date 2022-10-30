@@ -23,10 +23,10 @@ or many ranges separated by commas.
 it is read, and is written exactly once.
 <br>Each range is one of:
 
-- `N`      N'th byte, character or field, counted from 1
-- `N-`     from N'th byte, character or field, to end of line
-- `N-M`    from N'th to M'th (included) byte, character or field
-- `-M`      from first to M'th (included) byte, character or field
+- `N`      N'th field, counted from 1
+- `N-`     from N'th field, to end of line
+- `N-M`    from N'th to M'th (included) field
+- `-M`      from first to M'th (included) field
 
 Examples:
   ```
