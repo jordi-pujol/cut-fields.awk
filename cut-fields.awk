@@ -34,11 +34,6 @@ function usage(e1) {
 	exit 1
 }
 
-function bad_range() {
-	printf("bad field range: %s\n", f) > "/dev/stderr"
-	exit 1
-}
-
 BEGIN {
 	if (! fields)
 		usage()
@@ -57,45 +52,36 @@ BEGIN {
 			f=fieldsarray[h]
 			if (!f)
 				continue
-			i=index(f, "-")
-			if (i != 0) { # range
-				m = split(f, g, "-")
-				if (m == 2 && ! g[2])
-					m=1
-				if (m == 2 && ! g[1])
-					m=1
-				if (m == 0 || m > 2 \
-				|| (! g[1] && ! g[2]) \
-				|| (g[1] && g[1] !~ "^[[:digit:]]+$") \
-				|| (g[2] && g[2] !~ "^[[:digit:]]+$") \
-				|| (m == 2 && g[1] >= g[2]) )
-					bad_range()
-				if (m == 2)
-					for (j=g[1]; j <= g[2]; j++)
-						flist[j]=j
-				else
-					if (i == 1)
-						for (j=1; j <= g[2]; j++)
-							flist[j]=j
-					else
-						if (i == length(f)) {
-							for (j=g[1]; j <= NF; j++)
-								flist[j]=j
-							fieldsMin= g[1] >= NF ? g[1] : NF
-						} else
-							bad_range()
-			} else { # single field
-				if (f !~ "^[[:digit:]]+$")
-					bad_range()
-				flist[f] = f
+			m = split(f, g, "-")
+			if (m == 0 || m > 2 \
+			|| (! g[1] && ! g[2]) \
+			|| (g[1] && g[1] !~ "^[[:digit:]]+$") \
+			|| (g[2] && g[2] !~ "^[[:digit:]]+$") \
+			|| (g[1] && g[2] && g[1] > g[2]) ) {
+				printf("bad field range: %s\n", f) > "/dev/stderr"
+				exit 1
 			}
+			if (g[1] && g[2])
+				for (i=g[1]; i <= g[2]; i++)
+					flist[i]=i
+			else
+				if (g[2])
+					for (i=1; i <= g[2]; i++)
+						flist[i]=i
+				else
+					if (m == 2) {
+						for (i=g[1]; i <= NF; i++)
+							flist[i]=i
+						fieldsMin= g[1] >= NF ? g[1] : NF
+					} else
+						flist[g[1]]=g[1]
 		}
 		if (length(flist) == 0)
 			usage()
 	}
 	if (fieldsMin && fieldsMin < NF) {
-		for (j=fieldsMin+1; j <= NF; j++)
-			flist[j]=j
+		for (i=fieldsMin+1; i <= NF; i++)
+			flist[i]=i
 		fieldsMin=NF
 	}
 	for (i=NF; i>= 1; i--)
