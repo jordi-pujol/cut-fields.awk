@@ -14,7 +14,7 @@
 ##
 
 function usage(e1) {
-	e1 = "usage: echo \"text\" | cut-fields.awk" \
+	e1="usage: echo \"text\" | cut-fields.awk" \
 "\n\tMimics the syntax and behaviour of the coreutils cut utility." \
 "\n\tParameters are passed through variables:" \
 "\n\t-v fields= select only these fields;" \
@@ -52,7 +52,7 @@ BEGIN {
 			f=fieldsarray[h]
 			if (f == "")
 				continue
-			m = split(f, g, "-")
+			m=split(f, g, "-")
 			if (m == 0 || m > 2 \
 			|| (! g[1] && ! g[2]) \
 			|| (g[1] && (g[1] !~ "^[[:digit:]]+$" || g[1] <= 0)) \
