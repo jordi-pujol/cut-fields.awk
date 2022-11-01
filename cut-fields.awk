@@ -63,27 +63,26 @@ BEGIN {
 			}
 			if (g[1] && g[2])
 				for (i=g[1]; i <= g[2]; i++)
-					flist[i]=i
+					flist[i]=0
 			else
 				if (g[2])
 					for (i=1; i <= g[2]; i++)
-						flist[i]=i
+						flist[i]=0
 				else
 					if (m == 2) {
 						for (i=g[1]; i <= NF; i++)
-							flist[i]=i
+							flist[i]=0
 						fieldsMin= g[1] >= NF ? g[1] : NF
 					} else
-						flist[g[1]]=g[1]
+						flist[g[1]]=0
 		}
 		if (length(flist) == 0)
 			usage()
 	}
-	if (fieldsMin && fieldsMin < NF) {
-		for (i=fieldsMin+1; i <= NF; i++)
-			flist[i]=i
-		fieldsMin=NF
-	}
+	if (fieldsMin && fieldsMin < NF)
+		do
+			flist[++fieldsMin]=0
+		while (fieldsMin < NF)
 	for (i=NF; i>= 1; i--)
 		if (complement ? (i in flist) : !(i in flist)) {
 			for (j=i; j < NF; j++)
