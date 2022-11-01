@@ -50,13 +50,13 @@ BEGIN {
 		flistSet="y"
 		for (h in fieldsarray) {
 			f=fieldsarray[h]
-			if (!f)
+			if (f == "")
 				continue
 			m = split(f, g, "-")
 			if (m == 0 || m > 2 \
 			|| (! g[1] && ! g[2]) \
-			|| (g[1] && g[1] !~ "^[[:digit:]]+$") \
-			|| (g[2] && g[2] !~ "^[[:digit:]]+$") \
+			|| (g[1] && (g[1] !~ "^[[:digit:]]+$" || g[1] <= 0)) \
+			|| (g[2] && (g[2] !~ "^[[:digit:]]+$" || g[2] <= 0)) \
 			|| (g[1] && g[2] && g[1] > g[2]) ) {
 				printf("bad field range: %s\n", f) > "/dev/stderr"
 				exit 1
