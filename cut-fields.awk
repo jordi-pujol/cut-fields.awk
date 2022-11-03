@@ -81,13 +81,15 @@ BEGIN {
 			flist[++fieldsMin]=0
 		while (fieldsMin < NF)
 	res=""
+	r=""
 	for (i=1; i <= NF; i++)
 		if (complement == "" ? i in flist : !(i in flist)) {
-			if (res != "")
+			if (r)
 				res=res OFS
+			r="y"
 			res=res $i
 		}
-	if (res != "")
+	if (r)
 		print res
 	else
 		if (only_delimited == "") {
