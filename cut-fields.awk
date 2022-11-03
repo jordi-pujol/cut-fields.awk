@@ -38,8 +38,7 @@ BEGIN {
 	if (! fields)
 		usage()
 	gsub("^[,[:blank:]]+|[,[:blank:]]+$", "", fields)
-	split(fields, fieldsarray, "[,[:blank:]]+")
-	if (length(fieldsarray) == 0)
+	if (split(fields, fieldsarray, "[,[:blank:]]+") == 0)
 		usage()
 	fieldsMin=""
 	flistSet=""
@@ -76,8 +75,6 @@ BEGIN {
 					flist[g[1]]=0
 				}
 		}
-		if (length(flist) == 0)
-			usage()
 	}
 	if (fieldsMin && fieldsMin < NF)
 		do
@@ -93,6 +90,8 @@ BEGIN {
 	if (res != "")
 		print res
 	else
-		if (only_delimited == "")
-			print gensub(FS, OFS, "g", record)
+		if (only_delimited == "") {
+			gsub(FS, OFS, record)
+			print record
+		}
 }
