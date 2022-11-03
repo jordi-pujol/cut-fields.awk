@@ -88,8 +88,8 @@ BEGIN {
 			NF--
 		}
 	if ($0)
-		print $0
+		print gensub(FS, OFS, "g")
 	else
 		if (! only_delimited)
-			print record
+			print gensub(FS, OFS, "g", record)
 }
