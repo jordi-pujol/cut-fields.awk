@@ -43,6 +43,8 @@ BEGIN {
 		usage()
 	fieldsMin=""
 	flistSet=""
+	complement=complement
+	only_delimited=only_delimited
 }
 {
 	record=$0
@@ -54,18 +56,18 @@ BEGIN {
 				continue
 			m=split(f, g, "-")
 			if (m == 0 || m > 2 \
-			|| (! g[1] && ! g[2]) \
-			|| (g[1] && (g[1] !~ "^[[:digit:]]+$" || g[1] <= 0)) \
-			|| (g[2] && (g[2] !~ "^[[:digit:]]+$" || g[2] <= 0)) \
-			|| (g[1] && g[2] && g[1] > g[2]) ) {
+			|| (g[1] == "" && g[2] == "") \
+			|| (g[1] != "" && (g[1] !~ "^[[:digit:]]+$" || g[1] < 1)) \
+			|| (g[2] != "" && (g[2] !~ "^[[:digit:]]+$" || g[2] < 1)) \
+			|| (g[1] != "" && g[2] != "" && g[1] > g[2]) ) {
 				printf("bad field range: %s\n", f) > "/dev/stderr"
 				exit 1
 			}
-			if (g[1] && g[2])
+			if (g[1] != "" && g[2] != "")
 				for (i=g[1]; i <= g[2]; i++)
 					flist[i]=0
 			else
-				if (g[2])
+				if (g[2] != "")
 					for (i=1; i <= g[2]; i++)
 						flist[i]=0
 				else {
@@ -81,15 +83,16 @@ BEGIN {
 		do
 			flist[++fieldsMin]=0
 		while (fieldsMin < NF)
-	for (i=NF; i>= 1; i--)
-		if (complement ? (i in flist) : !(i in flist)) {
-			for (j=i; j < NF; j++)
-				$j=$(j+1)
-			NF--
+	res=""
+	for (i=1; i <= NF; i++)
+		if (complement == "" ? i in flist : !(i in flist)) {
+			if (res != "")
+				res=res OFS
+			res=res $i
 		}
-	if ($0)
-		print gensub(FS, OFS, "g")
+	if (res != "")
+		print res
 	else
-		if (! only_delimited)
+		if (only_delimited == "")
 			print gensub(FS, OFS, "g", record)
 }
