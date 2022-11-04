@@ -34,6 +34,11 @@ function usage(e1) {
 	exit 1
 }
 
+function bad_range() {
+	printf("bad field range: %s\n", f) > "/dev/stderr"
+	exit 1
+}
+
 BEGIN {
 	if (! fields)
 		usage()
@@ -41,41 +46,42 @@ BEGIN {
 	if (split(fields, fieldsarray, "[,[:blank:]]+") == 0)
 		usage()
 	fieldsMin=""
-	flistSet=""
 	complement=complement
 	only_delimited=only_delimited
+	for (h in fieldsarray) {
+		f=fieldsarray[h]
+		if (f == "")
+			continue
+		m=split(f, g, "-")
+		if (m == 1) {
+			if (g[1] != "" && (g[1] !~ "^[[:digit:]]+$" || g[1] < 1))
+				bad_range()
+		} else
+			if (m == 2) {
+				if ((g[1] == "" && g[2] == "") \
+				|| (g[2] != "" && (g[2] !~ "^[[:digit:]]+$" || g[2] < 1)) \
+				|| (g[1] != "" && g[2] != "" && g[1] > g[2]))
+					bad_range()
+			} else
+				bad_range()
+		if (g[1] != "" && g[2] != "")
+			for (i=g[1]; i <= g[2]; i++)
+				flist[i]=0
+		else
+			if (g[2] != "")
+				for (i=1; i <= g[2]; i++)
+					flist[i]=0
+			else {
+				if (m == 2) {
+					if (fieldsMin)
+						bad_range()
+					fieldsMin=g[1]
+				}
+				flist[g[1]]=0
+			}
+	}
 }
 {
-	record=$0
-	if (! flistSet) {
-		flistSet="y"
-		for (h in fieldsarray) {
-			f=fieldsarray[h]
-			if (f == "")
-				continue
-			m=split(f, g, "-")
-			if (m == 0 || m > 2 \
-			|| (g[1] == "" && g[2] == "") \
-			|| (g[1] != "" && (g[1] !~ "^[[:digit:]]+$" || g[1] < 1)) \
-			|| (g[2] != "" && (g[2] !~ "^[[:digit:]]+$" || g[2] < 1)) \
-			|| (g[1] != "" && g[2] != "" && g[1] > g[2]) ) {
-				printf("bad field range: %s\n", f) > "/dev/stderr"
-				exit 1
-			}
-			if (g[1] != "" && g[2] != "")
-				for (i=g[1]; i <= g[2]; i++)
-					flist[i]=0
-			else
-				if (g[2] != "")
-					for (i=1; i <= g[2]; i++)
-						flist[i]=0
-				else {
-					if (m == 2)
-						fieldsMin=g[1]
-					flist[g[1]]=0
-				}
-		}
-	}
 	if (fieldsMin && fieldsMin < NF)
 		do
 			flist[++fieldsMin]=0
@@ -93,7 +99,7 @@ BEGIN {
 		print res
 	else
 		if (only_delimited == "") {
-			gsub(FS, OFS, record)
-			print record
+			gsub(FS, OFS)
+			print $0
 		}
 }
