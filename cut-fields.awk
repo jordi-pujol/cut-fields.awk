@@ -35,8 +35,16 @@ function usage(e1) {
 }
 
 function bad_range() {
-	printf("bad field range: %s\n", f) > "/dev/stderr"
+	printf("err: bad field range %s\n", f) > "/dev/stderr"
 	exit 1
+}
+
+function flist_append(n, r) {
+	if ((fieldsMin != "" && n >= fieldsMin) \
+	|| flist[n] != "")
+		printf("warn: field no. %d overlapping in range %s\n", n, r) > "/dev/stderr"
+	fieldMax=fieldMax <= n ? fieldMax : n
+	flist[n]=1
 }
 
 BEGIN {
@@ -46,6 +54,7 @@ BEGIN {
 	if (split(fields, fieldsarray, "[,[:blank:]]+") == 0)
 		usage()
 	fieldsMin=""
+	fieldMax=""
 	complement=complement
 	only_delimited=only_delimited
 	for (h in fieldsarray) {
@@ -67,25 +76,27 @@ BEGIN {
 				bad_range()
 		if (g[1] != "" && g[2] != "")
 			for (i=g[1]; i <= g[2]; i++)
-				flist[i]=0
+				flist_append(i, f)
 		else
 			if (g[2] != "")
 				for (i=1; i <= g[2]; i++)
-					flist[i]=0
+					flist_append(i, f)
 			else {
 				if (m == 2) {
-					if (fieldsMin)
-						bad_range()
+					if (g[1] < fieldMax)
+						printf("warn: field no. %d overlapping in range %s\n", \
+							g[1], f) > "/dev/stderr"
+					flist_append(g[1], f)
 					fieldsMin=g[1]
-				}
-				flist[g[1]]=0
+				} else
+					flist_append(g[1], f)
 			}
 	}
 }
 {
 	if (fieldsMin && fieldsMin < NF)
 		do
-			flist[++fieldsMin]=0
+			flist[++fieldsMin]=1
 		while (fieldsMin < NF)
 	res=""
 	r=""
