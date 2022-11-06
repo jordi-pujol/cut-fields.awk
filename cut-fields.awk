@@ -43,7 +43,7 @@ function flist_append(n, r) {
 	if ((fieldsMin != "" && n >= fieldsMin) \
 	|| flist[n] != "")
 		printf("warn: field no. %d overlapping in range %s\n", n, r) > "/dev/stderr"
-	fieldMax=fieldMax <= n ? fieldMax : n
+	fieldMax= fieldMax > n ? fieldMax : n
 	flist[n]=1
 }
 
@@ -87,14 +87,15 @@ BEGIN {
 						printf("warn: field no. %d overlapping in range %s\n", \
 							g[1], f) > "/dev/stderr"
 					flist_append(g[1], f)
-					fieldsMin=g[1]
+					if (fieldsMin == "" || g[1] < fieldsMin) \
+						fieldsMin=g[1]
 				} else
 					flist_append(g[1], f)
 			}
 	}
 }
 {
-	if (fieldsMin && fieldsMin < NF)
+	if (fieldsMin != "" && fieldsMin < NF)
 		do
 			flist[++fieldsMin]=1
 		while (fieldsMin < NF)
