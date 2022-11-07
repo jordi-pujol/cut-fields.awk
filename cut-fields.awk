@@ -87,7 +87,7 @@ BEGIN {
 						printf("warn: field no. %d overlapping in range %s\n", \
 							g[1], f) > "/dev/stderr"
 					flist_append(g[1], f)
-					if (fieldsMin == "" || g[1] < fieldsMin) \
+					if (fieldsMin == "" || g[1] < fieldsMin)
 						fieldsMin=g[1]
 				} else
 					flist_append(g[1], f)
